@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Korea Economy Daily News Tracker</title>
+  <style>
+    :root {
+      --bg: #f3eee5;
+      --panel: rgba(255, 251, 245, 0.92);
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: rgba(31, 41, 55, 0.12);
+      --accent: #0f766e;
+      --accent-soft: rgba(15, 118, 110, 0.12);
+      --warn: #9a3412;
+      --warn-soft: rgba(154, 52, 18, 0.1);
+      --positive: #16a34a;
+      --negative: #dc2626;
+      --neutral: #1f2937;
+      --shadow: 0 18px 40px rgba(35, 44, 60, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.16), transparent 26%),
+        radial-gradient(circle at left center, rgba(154, 52, 18, 0.1), transparent 22%),
+        linear-gradient(180deg, #f8f4ec 0%, #efe8dc 100%);
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .hero, .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 30px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .panel h2,
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .input-box {
+      min-height: 124px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px dashed rgba(31, 41, 55, 0.18);
+      background: #fcfbf8;
+      line-height: 1.8;
+    }
+
+    .pill-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #e8f5f3;
+      color: #115e59;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .section {
+      padding: 24px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    .card, .empty {
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rank {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--warn-soft);
+      color: var(--warn);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .card h3, .empty h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+
+    .title-positive {
+      color: var(--positive);
+    }
+
+    .title-negative {
+      color: var(--negative);
+    }
+
+    .title-neutral {
+      color: var(--neutral);
+    }
+
+    .card p, .empty p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .scrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .scrap p {
+      margin: 0;
+      color: var(--ink);
+      line-height: 1.75;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .impact {
+      background: rgba(31, 41, 55, 0.04);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 14px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 880px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">NAVER Open API Daily Tracker</span>
+      <h1>Korea Economy Daily News Tracker</h1>
+      <p>Generated at: 2026-03-24 22:06:28 | Target date: 2026-03-24 | Search window: 2026-03-18 to 2026-03-24 | Sort: date | Showing top 10</p>
+
+      <div class="hero-grid">
+        <div class="panel">
+          <h2>Current keyword box</h2>
+          <div class="input-box">
+            <div class="pill-wrap">
+              <span class='pill'>한국 경제</span>
+<span class='pill'>코스피</span>
+<span class='pill'>원달러 환율</span>
+<span class='pill'>반도체 수출</span>
+<span class='pill'>한국은행 금리</span>
+<span class='pill'>국제유가</span>
+<span class='pill'>물가</span>
+<span class='pill'>추경</span>
+<span class='pill'>부동산</span>
+<span class='pill'>관세</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Top articles</h2>
+      <div class="cards">
+              <article class="card">
+        <div class="card-top">
+          <div class="rank">1</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 19:50</span>
+          <span>www.asiatoday.co.kr</span>
+        </div>
+        <h3 class="title-positive">6개월째 뛴 생산자물가… 제품값 줄인상 경고등</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 원/달러 환율 상승, 시장 변수로 부각.</p>
+          <p><strong>상승/하락 이유:</strong> 환율 변동성이 환율 관련 심리와 자금 흐름에 영향을 줍니다.</p>
+          <p><strong>관련 종목:</strong> S-Oil, SK Innovation, 한국전력, 대한항공</p>
+          <p><strong>내 해석/체크포인트:</strong> 원/달러 레벨과 외국인 수급 연계를 같이 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 환율<br /><strong>관련성 점수:</strong> 30<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://www.asiatoday.co.kr/view.php?key=20260325010007431" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">2</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 21:34</span>
+          <span>www.ajunews.com</span>
+        </div>
+        <h3 class="title-neutral">글로벌 기업 낙관론 확산 속 &#39;신중한 한국&#39;…포비스 마자르, &#39;2026 글로벌...</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 원/달러 환율 시장 변수로 부각.</p>
+          <p><strong>상승/하락 이유:</strong> 환율 변동성이 환율 관련 심리와 자금 흐름에 영향을 줍니다.</p>
+          <p><strong>관련 종목:</strong> 한국전력, 대한항공</p>
+          <p><strong>내 해석/체크포인트:</strong> 원/달러 레벨과 외국인 수급 연계를 같이 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 환율<br /><strong>관련성 점수:</strong> 22<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://www.ajunews.com/view/20260324212210800" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">3</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 21:28</span>
+          <span>www.tokenpost.kr</span>
+        </div>
+        <h3 class="title-negative">트럼프 발언에 원/달러 환율 급락, 시장 불안 여전</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 코스피 하락, 핵심 수치 2.74%.</p>
+          <p><strong>상승/하락 이유:</strong> 환율 변동성이 코스피 관련 심리와 자금 흐름에 영향을 줍니다.</p>
+          <p><strong>관련 종목:</strong> KOSPI, 삼성전자, SK hynix, 한국전력, 대한항공</p>
+          <p><strong>내 해석/체크포인트:</strong> 지수 방향과 외국인 순매수/순매도가 같은 방향인지 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 코스피<br /><strong>관련성 점수:</strong> 20<br /><strong>정량 점수:</strong> 12</div>
+        <a href="https://www.tokenpost.kr/news/economy/342834" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">4</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 20:26</span>
+          <span>www.digitaltoday.co.kr</span>
+        </div>
+        <h3 class="title-neutral">부광약품, 안정적 배당정책 운영으로 주주환원 지속성 제고 계획</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 코스피 관련 핵심 수치: 601억, 16억, 35억.</p>
+          <p><strong>상승/하락 이유:</strong> 증시 변동 자체가 투자자 심리와 대형주 수급을 반영합니다.</p>
+          <p><strong>관련 종목:</strong> KOSPI, 삼성전자, SK hynix</p>
+          <p><strong>내 해석/체크포인트:</strong> 지수 방향과 외국인 순매수/순매도가 같은 방향인지 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 코스피<br /><strong>관련성 점수:</strong> 20<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://www.digitaltoday.co.kr/news/articleView.html?idxno=645128" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">5</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 20:16</span>
+          <span>www.digitaltoday.co.kr</span>
+        </div>
+        <h3 class="title-neutral">케이씨, 기취득 자기주식 보통주식 184만9612주 소각 결정</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 코스피 관련 핵심 수치: 184만, 385억, 280억.</p>
+          <p><strong>상승/하락 이유:</strong> 증시 변동 자체가 투자자 심리와 대형주 수급을 반영합니다.</p>
+          <p><strong>관련 종목:</strong> KOSPI, 삼성전자, SK hynix</p>
+          <p><strong>내 해석/체크포인트:</strong> 지수 방향과 외국인 순매수/순매도가 같은 방향인지 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 코스피<br /><strong>관련성 점수:</strong> 18<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://www.digitaltoday.co.kr/news/articleView.html?idxno=645120" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">6</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 19:44</span>
+          <span>www.hansbiz.co.kr</span>
+        </div>
+        <h3 class="title-positive">aT, 말레이시아 이슬람 라마단 &#39;할랄 K푸드&#39; 선보여</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 수출 관련 핵심 수치: 2배, 4.5%.</p>
+          <p><strong>상승/하락 이유:</strong> 핵심 경제 지표와 심리 변화가 해당 뉴스 흐름을 만듭니다.</p>
+          <p><strong>관련 종목:</strong> 지수 ETF 또는 업종 대표주 확인</p>
+          <p><strong>내 해석/체크포인트:</strong> 헤드라인 보다 실제 수치가 계속 연결되는지 체크하세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 수출<br /><strong>관련성 점수:</strong> 16<br /><strong>정량 점수:</strong> 10</div>
+        <a href="http://www.hansbiz.co.kr/news/articleView.html?idxno=827128" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">7</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 20:30</span>
+          <span>www.digitaltoday.co.kr</span>
+        </div>
+        <h3 class="title-neutral">부광약품, 제66기 재무제표 승인 및 현금배당 결의</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 코스피 관련 핵심 수치: 601억, 16억, 35억.</p>
+          <p><strong>상승/하락 이유:</strong> 증시 변동 자체가 투자자 심리와 대형주 수급을 반영합니다.</p>
+          <p><strong>관련 종목:</strong> KOSPI, 삼성전자, SK hynix</p>
+          <p><strong>내 해석/체크포인트:</strong> 지수 방향과 외국인 순매수/순매도가 같은 방향인지 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 코스피<br /><strong>관련성 점수:</strong> 16<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://www.digitaltoday.co.kr/news/articleView.html?idxno=645132" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">8</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 21:25</span>
+          <span>biz.heraldcorp.com</span>
+        </div>
+        <h3 class="title-positive">개미 26조 순매수 vs 외국인 22조 순매도…계속되는 코스피 ‘수급 전쟁...</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 코스피 상승, 핵심 수치 26조, 22조.</p>
+          <p><strong>상승/하락 이유:</strong> 환율 변동성이 코스피 관련 심리와 자금 흐름에 영향을 줍니다.</p>
+          <p><strong>관련 종목:</strong> 삼성전자, SK hynix, KOSPI, S-Oil, SK Innovation, 한국전력, 대한항공</p>
+          <p><strong>내 해석/체크포인트:</strong> 지수 방향과 외국인 순매수/순매도가 같은 방향인지 보세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 코스피<br /><strong>관련성 점수:</strong> 15<br /><strong>정량 점수:</strong> 7</div>
+        <a href="https://biz.heraldcorp.com/article/10701836?ref=naver" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">9</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 20:00</span>
+          <span>www.wowtv.co.kr</span>
+        </div>
+        <h3 class="title-positive">&quot;미국선 이미 독보적 1위&quot;…K뷰티, 프랑스 추격전 본격화</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 수출 상승, 핵심 수치 25%.</p>
+          <p><strong>상승/하락 이유:</strong> 핵심 경제 지표와 심리 변화가 해당 뉴스 흐름을 만듭니다.</p>
+          <p><strong>관련 종목:</strong> 지수 ETF 또는 업종 대표주 확인</p>
+          <p><strong>내 해석/체크포인트:</strong> 헤드라인 보다 실제 수치가 계속 연결되는지 체크하세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 수출<br /><strong>관련성 점수:</strong> 14<br /><strong>정량 점수:</strong> 10</div>
+        <a href="https://www.wowtv.co.kr/NewsCenter/News/Read?articleId=A202603240383&amp;t=NNv" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      <article class="card">
+        <div class="card-top">
+          <div class="rank">10</div>
+          <div class="badge">Impact Medium</div>
+        </div>
+        <div class="meta">
+          <span>2026-03-24 19:08</span>
+          <span>www.kyongbuk.co.kr</span>
+        </div>
+        <h3 class="title-neutral">미 철강관세 50% 지속시 한국경제 연 3조 손실 경고</h3>
+        <div class="scrap">
+          <p><strong>한 줄 요약:</strong> 금리 관련 핵심 수치: 50%, 3조.</p>
+          <p><strong>상승/하락 이유:</strong> 금리 전망 변화가 채권, 증시, 환율에 동시 영향을 주는 구조입니다.</p>
+          <p><strong>관련 종목:</strong> 신한지주, 하나금융지주</p>
+          <p><strong>내 해석/체크포인트:</strong> 한국은행 발언, 국고채 금리, 은행주 흐름을 함께 체크하세요.</p>
+        </div>
+        <div class="impact"><strong>매치 키워드:</strong> 금리<br /><strong>관련성 점수:</strong> 14<br /><strong>정량 점수:</strong> 8</div>
+        <a href="https://www.kyongbuk.co.kr/news/articleView.html?idxno=4067935" target="_blank" rel="noreferrer">Open article</a>
+      </article>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
